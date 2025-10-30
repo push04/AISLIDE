@@ -51,3 +51,18 @@ The application is built with a strong focus on a dark-mode-only UI, featuring g
 -   **TanStack Router:** Type-safe routing.
 -   **Framer Motion:** Animation library.
 -   **TipTap Editor:** Rich text editor.
+
+## Environment Setup
+The application requires three environment variables to be configured:
+- `VITE_SUPABASE_URL` - Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Your Supabase anonymous key
+- `VITE_OPENROUTER_API_KEY` - Your OpenRouter API key for AI features
+
+These are stored in `.env` file (not committed to git).
+
+## Recent Changes (October 30, 2025)
+- **Setup for Replit Environment**: Configured Vite to work with Replit's proxy system (port 5000, HMR settings).
+- **Auto Profile Creation**: Added automatic user profile creation when users sign up or sign in (ensureUserProfile function in AuthContext).
+- **Database Schema Update**: Added trigger function `handle_new_user()` to auto-create user profiles in schema.sql.
+- **TypeScript Type Fixes**: Updated database types to match actual Supabase schema for user_profiles Insert type.
+- **Environment Variables**: Set up Supabase and OpenRouter credentials in .env file.

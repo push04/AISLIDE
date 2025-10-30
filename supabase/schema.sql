@@ -802,6 +802,27 @@ CREATE POLICY "Users can update own shared content" ON shared_content FOR UPDATE
 CREATE POLICY "Users can delete own shared content" ON shared_content FOR DELETE USING (auth.uid() = owner_id);
 
 -- =====================================================
+-- TRIGGER FOR AUTO-CREATING USER PROFILES
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.user_profiles (id, email, full_name)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email)
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- =====================================================
 -- TRIGGERS FOR AUTO-UPDATING TIMESTAMPS
 -- =====================================================
 

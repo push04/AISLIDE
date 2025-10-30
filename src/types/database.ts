@@ -25,7 +25,24 @@ export type Database = {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['user_profiles']['Row'], 'id' | 'created_at' | 'updated_at' | 'total_xp' | 'current_level' | 'current_streak' | 'longest_streak'>;
+        Insert: {
+          id: string;
+          email: string;
+          full_name?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
+          language_preference?: string;
+          timezone?: string;
+          total_xp?: number;
+          current_level?: number;
+          current_streak?: number;
+          longest_streak?: number;
+          last_study_date?: string | null;
+          notifications_enabled?: boolean;
+          email_notifications?: boolean;
+          study_reminders?: boolean;
+          openrouter_api_key_encrypted?: string | null;
+        };
         Update: Partial<Database['public']['Tables']['user_profiles']['Insert']>;
       };
       uploads: {

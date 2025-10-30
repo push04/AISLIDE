@@ -13,6 +13,37 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper function to ensure user profile exists
+async function ensureUserProfile(user: User) {
+  if (!supabase) return;
+  
+  try {
+    // Check if profile exists
+    const { data, error: fetchError } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+    
+    // If profile doesn't exist, create it
+    if (!data && !fetchError) {
+      const { error: insertError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: user.id,
+          email: user.email!,
+          full_name: user.user_metadata?.full_name || null,
+        });
+      
+      if (insertError) {
+        console.error('Error creating user profile:', insertError);
+      }
+    }
+  } catch (error) {
+    console.error('Error ensuring user profile:', error);
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -25,16 +56,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Auto-create user profile if it doesn't exist
+      if (session?.user) {
+        await ensureUserProfile(session.user);
+      }
+      
       setLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // Auto-create user profile if it doesn't exist
+      if (session?.user) {
+        await ensureUserProfile(session.user);
+      }
+      
       setLoading(false);
     });
 
