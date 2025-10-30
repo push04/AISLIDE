@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { EnhancedNavigation } from './components/enhanced/EnhancedNavigation';
 import { EnhancedDashboard } from './components/enhanced/EnhancedDashboard';
@@ -6,14 +6,13 @@ import { AnalyticsDashboard } from './components/enhanced/AnalyticsDashboard';
 import { CommandPalette, useCommandPalette } from './components/enhanced/CommandPalette';
 import { AuthGate } from './components/auth/AuthGate';
 import { ProfilePage } from './components/auth/ProfilePage';
-import { Dashboard } from './components/Dashboard';
-import { UploadManager, Upload } from './components/UploadManager';
+import { UploadManager } from './components/UploadManager';
 import { LessonGenerator } from './components/LessonGenerator';
 import { QuizManager } from './components/QuizManager';
 import { FlashcardManager } from './components/FlashcardManager';
 import { ChatInterface } from './components/ChatInterface';
 import { Settings } from './components/Settings';
-import { processor } from './services/FileProcessor';
+import { processor, Upload } from './services/FileProcessor';
 import { FlashcardProvider } from './contexts/FlashcardContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -39,9 +38,6 @@ function AppContent() {
     return newUpload;
   }, [setUploads]);
 
-  const handleUpdateUpload = useCallback((id: string, updates: Partial<Upload>) => {
-    setUploads(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
-  }, [setUploads]);
 
   const handleDeleteUpload = useCallback((id: string) => {
     setUploads(prev => prev.filter(u => u.id !== id));
@@ -56,7 +52,6 @@ function AppContent() {
       <UploadManager
         uploads={uploads}
         onAddUpload={handleAddUpload}
-        onUpdateUpload={handleUpdateUpload}
         onDeleteUpload={handleDeleteUpload}
       />
     ),

@@ -1,9 +1,8 @@
 import React from 'react';
 import { 
   LayoutDashboard, Upload, BookOpen, Brain, Layers, 
-  MessageSquare, Settings, Moon, Sun, Sparkles, TrendingUp, Command, User
+  MessageSquare, Settings, Sparkles, TrendingUp, Command
 } from 'lucide-react';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
 import type { TabType } from '../../App';
@@ -32,7 +31,6 @@ interface EnhancedNavigationProps {
 }
 
 export function EnhancedNavigation({ activeTab, onTabChange }: EnhancedNavigationProps) {
-  const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
 
   return (
@@ -107,7 +105,7 @@ export function EnhancedNavigation({ activeTab, onTabChange }: EnhancedNavigatio
             </select>
           </div>
 
-          {/* Command Palette Hint, Profile & Theme Toggle */}
+          {/* Command Palette Hint & Profile */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => {}}
@@ -135,23 +133,6 @@ export function EnhancedNavigation({ activeTab, onTabChange }: EnhancedNavigatio
                 <span className="hidden md:inline text-sm font-medium">Profile</span>
               </button>
             )}
-            
-            <button
-              onClick={toggleTheme}
-              className="relative p-2.5 rounded-lg bg-muted/50 hover:bg-muted transition-all duration-200 active:scale-95 group"
-              aria-label="Toggle theme"
-            >
-              <div className="relative w-5 h-5">
-                <Sun className={cn(
-                  'absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-300',
-                  theme === 'dark' ? 'rotate-90 scale-0' : 'rotate-0 scale-100'
-                )} />
-                <Moon className={cn(
-                  'absolute inset-0 w-5 h-5 text-blue-500 transition-all duration-300',
-                  theme === 'dark' ? 'rotate-0 scale-100' : '-rotate-90 scale-0'
-                )} />
-              </div>
-            </button>
           </div>
         </div>
       </div>

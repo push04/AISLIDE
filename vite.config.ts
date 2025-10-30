@@ -7,8 +7,12 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
+    strictPort: false,
     hmr: {
-      clientPort: 5000,
+      protocol: 'wss',
+      host: process.env.REPL_SLUG ? `${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'localhost',
+      clientPort: 443,
+      overlay: false,
     },
   },
   optimizeDeps: {
@@ -16,12 +20,9 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      // This tells Vite's bundler (Rollup) to not bundle these libraries,
-      // as they are designed to be loaded from a CDN or have structures
-      // that are not easily bundled. This resolves the build errors.
       external: [
         'pdfjs-dist/legacy/build/pdf',
-        'jszip', // Add jszip to the external array
+        'jszip',
       ],
     },
   },

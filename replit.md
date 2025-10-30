@@ -1,217 +1,403 @@
-# SlideTutor AI - Next-Generation Learning Platform
+# SlideTutor AI - AI-Powered Learning Platform
 
 ## Overview
-SlideTutor AI is a production-ready, feature-rich learning platform that transforms educational content into interactive lessons, quizzes, and flashcards using AI. Built with modern web technologies and a beautiful, accessible UI with dark/light themes.
+SlideTutor AI is a production-ready, feature-rich learning platform that transforms educational content into interactive lessons, quizzes, and flashcards using AI. Built with modern web technologies and a beautiful, dark-mode-only UI.
 
-## Key Features
+## 🎯 Current Status
+
+### ✅ Phase 1 Complete (Production-Ready Foundation)
+- **Dark Mode Only**: Enforced across entire application, light mode removed
+- **Mandatory Authentication**: Supabase auth required for all users
+- **Comprehensive Database Schema**: Full SQL schema with 17 table groups for all planned features
+- **React Query Setup**: Infrastructure for Supabase data management
+- **TypeScript Types**: Complete database types for type-safe development
+
+### 🚧 In Progress (Phase 2-5)
+The foundational infrastructure is complete. The following phases require additional development:
+
+**Phase 2: localStorage → Supabase Migration**
+- Replace all localStorage with Supabase-backed storage
+- Migrate uploads, lessons, flashcards, quizzes, chat to database
+- Secure API key storage in user profiles
+
+**Phase 3: New Features**
+- Study streaks & gamification (XP, levels, achievements)
+- Enhanced analytics dashboard with charts
+- Note-taking system with rich text editor
+- Study groups & collaborative features
+- AI-powered recommendations
+- Global search across content
+- Export/share functionality
+- Goals, milestones & notifications
+- Leaderboards
+
+**Phase 4: UX/UI Polish**
+- Error boundaries & loading states
+- Mobile responsive enhancements
+- Onboarding tour for new users
+- Accessibility improvements
+
+**Phase 5: Production Readiness**
+- End-to-end testing
+- Performance optimization
+- Final documentation
+
+## 🚀 Key Features
 
 ### 🎨 Beautiful UI/UX
-- **Dark/Light Theme Toggle**: Seamless theme switching with smooth transitions
+- **Dark Mode Only**: Sleek, modern dark theme optimized for extended study sessions
 - **Glass Morphism Effects**: Modern frosted-glass design elements
 - **Gradient Animations**: Dynamic, animated gradient backgrounds
 - **Responsive Design**: Works perfectly on mobile, tablet, and desktop
 - **Accessibility**: Full keyboard navigation, ARIA labels, and screen reader support
 
-### 🚀 Core Learning Features
+### 🔐 Security & Authentication
+- **Mandatory Authentication**: All users must sign in via Supabase
+- **Row Level Security**: Database policies ensure users only access their own data
+- **Secure Sessions**: Auto-refresh tokens and persistent sessions
+- **Social Auth**: Google and GitHub OAuth supported
+
+### 📚 Core Learning Features
 - **AI-Powered Lessons**: Generate comprehensive lessons from uploaded content
 - **Adaptive Quizzes**: Multiple question types with explanations and adaptive difficulty
 - **Smart Flashcards**: Spaced repetition (SM-2 algorithm) for optimal retention
 - **Chat Q&A**: Ask questions about your documents with AI assistance
+- **File Upload**: PDF and PPTX support with text extraction
 
-### 🔐 Production-Ready Features
-- **Supabase Integration**: Database, authentication, storage, and realtime features
-- **Environment Variables**: Secure API key management via Netlify
-- **Error Handling**: Graceful fallbacks and user-friendly error messages
-- **Performance**: Optimized bundle size and fast load times
-- **Toast Notifications**: Beautiful feedback for user actions
+### 🗄️ Database Architecture
 
-## Technology Stack
+The application uses Supabase (PostgreSQL) with the following structure:
+
+**User Management**
+- `user_profiles`: User data with XP, streaks, levels, preferences
+- `user_achievements`: Achievement unlocks per user
+- `user_streaks`: Daily study tracking
+
+**Content Storage**
+- `uploads`: File metadata and extracted content
+- `lessons`: AI-generated and user-created lessons
+- `notes`: Rich text notes with annotations
+- `flashcard_decks` & `flashcards`: Spaced repetition cards
+
+**Learning Activities**
+- `quiz_sessions` & `quiz_questions`: Quiz attempts and results
+- `chat_conversations` & `chat_messages`: AI chat history
+- `study_sessions`: Time tracking and performance metrics
+
+**Social & Gamification**
+- `study_groups` & `group_members`: Collaborative learning
+- `achievements`: Unlockable milestones
+- `leaderboard_entries`: Competitive rankings
+- `bookmarks`: Saved content
+- `shared_content`: Public sharing with codes
+
+**Smart Features**
+- `study_recommendations`: AI-powered suggestions
+- `user_goals`: Progress tracking
+- `notifications`: System alerts
+- `user_tags`: Custom organization
+
+## 🔧 Tech Stack
+
 - **Frontend**: React 18 + TypeScript + Vite
-- **Styling**: Tailwind CSS with custom design system
-- **State Management**: Zustand + React Context + React Query
-- **UI Components**: Custom components with Radix UI primitives
-- **AI Provider**: OpenRouter API (multiple free and paid models)
-- **Database**: Supabase (PostgreSQL with Row Level Security)
-- **File Processing**: PDF.js and JSZip (CDN-loaded)
-- **Animations**: Framer Motion + CSS animations
-- **Rich Text**: TipTap editor for lesson creation
+- **Styling**: Tailwind CSS + Custom CSS Variables
+- **State Management**: React Query + Zustand
+- **Authentication**: Supabase Auth
+- **Database**: Supabase (PostgreSQL)
+- **AI**: OpenRouter API (GPT-4, Claude, etc.)
+- **File Processing**: PDF.js + JSZip
+- **UI Components**: Radix UI + Lucide Icons
+- **Rich Text**: TipTap Editor
+- **Charts**: Recharts
+- **Routing**: TanStack Router
+- **Animations**: Framer Motion
 
-## Project Structure
-```
-src/
-├── components/
-│   ├── enhanced/          # New enhanced UI components
-│   │   ├── EnhancedNavigation  # Beautiful nav with theme toggle
-│   │   ├── EnhancedDashboard   # Modern dashboard
-│   │   ├── Button              # Reusable button component
-│   │   └── Card                # Glass morphism card components
-│   ├── ChatInterface      # AI-powered Q&A
-│   ├── Dashboard          # Legacy dashboard
-│   ├── FlashcardManager   # Spaced repetition study
-│   ├── LessonGenerator    # AI lesson creation
-│   ├── QuizManager        # Quiz generation and taking
-│   ├── Settings           # API key management
-│   └── UploadManager      # File upload and processing
-├── contexts/
-│   ├── ThemeContext       # Dark/light theme management
-│   ├── AuthContext        # Supabase authentication
-│   └── FlashcardContext   # Flashcard state management
-├── lib/
-│   ├── theme.ts           # Theme configuration and utilities
-│   ├── supabase.ts        # Supabase client setup
-│   ├── openrouter.ts      # OpenRouter API integration
-│   └── utils.ts           # Utility functions
-├── hooks/                 # Custom React hooks
-├── services/              # Business logic
-└── index.css              # Global styles with CSS variables
-```
+## 📋 Environment Variables
 
-## Design System
-
-### Color Palette
-- **Primary**: Pink gradient (#FF6384)
-- **Secondary**: Indigo/Purple (#6366F1 → #8B5CF6)
-- **Accent**: Pink/Rose (#EC4899)
-- **Success/Warning/Error**: Semantic colors
-
-### Theme Support
-```typescript
-// Themes automatically apply to all components
-- Light mode: Clean, bright, professional
-- Dark mode: Deep blues with vibrant accents
-- Smooth transitions between themes
-```
-
-### Component Variants
-- **Cards**: Default, Glass, Gradient
-- **Buttons**: Primary, Secondary, Outline, Ghost, Danger
-- **Animations**: Scale-in, Slide-up, Fade-in, Shimmer
-
-## Recent Changes
-- **2025-10-30 (Major Update)**: Production-ready transformation
-  - Implemented beautiful dark/light theme system
-  - Added glass morphism and gradient effects throughout UI
-  - Created comprehensive design system with Tailwind
-  - Integrated Supabase for database and authentication
-  - Added enhanced navigation with theme toggle
-  - Created reusable UI component library
-  - Removed hardcoded API keys (security fix)
-  - Added environment variable support
-  - Implemented toast notifications
-  - Enhanced dashboard with stats and quick actions
-  - Added smooth animations and transitions
-  - Improved accessibility and keyboard navigation
-
-## Environment Variables
-
-Create a `.env` file (see `.env.example`):
+Create a `.env` file or set these in your Replit Secrets:
 
 ```env
-# Supabase Configuration
+# Supabase Configuration (REQUIRED)
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# OpenRouter API
+# OpenRouter API (REQUIRED for AI features)
 VITE_OPENROUTER_API_KEY=your_openrouter_api_key
 ```
 
-**For Netlify Deployment**: Add these as environment variables in your Netlify dashboard.
+### Getting API Keys
 
-## Supabase Database Schema
+1. **Supabase** (Free tier available)
+   - Go to https://supabase.com
+   - Create a new project
+   - Find your URL and anon key in Settings → API
 
-The app is ready for Supabase integration with the following schema:
+2. **OpenRouter** (Pay-per-use)
+   - Go to https://openrouter.ai
+   - Sign up and get your API key
+   - Add credits to your account
 
-### Tables
-- `user_profiles`: User information and preferences
-- `lessons`: AI-generated lessons with tags and metadata
-- `flashcard_decks`: Flashcard collections
-- `flashcards`: Individual flashcards with SM-2 algorithm data
-- `quizzes`: Quiz metadata
-- `quiz_attempts`: Quiz session tracking
+## 🚀 Getting Started
 
-### Features Ready
-- Row Level Security (RLS) policies
-- Real-time subscriptions for collaborative features
-- Vector search for semantic lesson discovery
-- File storage for uploads (PDFs, PPTX)
+### 1. Set Up Supabase
 
-## Development
+Run the SQL schema to create all necessary tables:
 
-### Setup
+```bash
+# In your Supabase SQL Editor, run:
+supabase/schema.sql
+```
+
+This creates:
+- All tables with proper relationships
+- Row Level Security policies
+- Indexes for performance
+- Trigger functions
+- Default achievements
+
+### 2. Install Dependencies
+
 ```bash
 npm install
-npm run dev  # Starts on port 5000
 ```
 
-### Building
+### 3. Configure Environment
+
+Add the required environment variables (see above).
+
+### 4. Run Development Server
+
 ```bash
-npm run build  # Production build
-npm run preview  # Preview production build
+npm run dev
 ```
 
-### Code Quality
+The app will be available at `http://localhost:5000`
+
+### 5. Build for Production
+
 ```bash
-npm run lint  # ESLint
+npm run build
+npm run preview
 ```
 
-## Production Deployment
+## 📱 Features in Detail
 
-### Netlify Setup
-1. Connect your GitHub repository
-2. Set build command: `npm run build`
-3. Set publish directory: `dist`
-4. Add environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_OPENROUTER_API_KEY`
+### Upload & Processing
+- Drag & drop PDF and PPTX files
+- Automatic text extraction
+- Progress tracking
+- Error handling with retry
 
-### Supabase Setup
-1. Create a Supabase project
-2. Run the SQL schema migrations (see database setup docs)
-3. Enable Row Level Security
-4. Configure storage buckets for file uploads
-5. Set up authentication providers (email, Google, GitHub)
+### AI Lesson Generation
+- Beginner, Intermediate, Advanced levels
+- Structured content with explanations
+- Examples and tips
+- Quick quizzes
 
-## Security Features
-- ✅ No hardcoded API keys or secrets
-- ✅ Environment variables for all sensitive data
-- ✅ Supabase Row Level Security (RLS)
-- ✅ Secure authentication with Supabase Auth
-- ✅ Client-side validation and sanitization
-- ✅ Graceful error handling
+### Flashcard System
+- SM-2 spaced repetition algorithm
+- Difficulty tracking
+- Review scheduling
+- Statistics and progress
 
-## Accessibility
-- ✅ Keyboard navigation support
-- ✅ ARIA labels and landmarks
-- ✅ Focus visible states
-- ✅ Screen reader friendly
-- ✅ High contrast modes
-- ✅ Reduced motion support
+### Quiz System
+- Multiple choice questions
+- Instant feedback
+- Explanations for answers
+- Session history
 
-## Performance
-- ✅ Code splitting and lazy loading
-- ✅ Optimized bundle size
-- ✅ Fast initial load (<2s)
-- ✅ Smooth 60fps animations
-- ✅ Efficient re-renders with React Query
+### Chat Interface
+- Context-aware AI responses
+- Document-based Q&A
+- Conversation history
+- Model selection
 
-## Browser Support
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Mobile browsers (iOS Safari, Chrome Mobile)
+## 🎨 Customization
 
-## Future Enhancements
-- Offline-first with Service Workers
-- Real-time collaboration (study rooms)
-- Shared decks and community features
-- Analytics dashboard
-- Command palette (⌘K)
-- Data export/import
-- Mobile app (React Native)
+### Dark Mode Colors
+Colors are defined in `src/lib/theme.ts`:
+- Primary: Pink (#FF6384)
+- Secondary: Indigo (#818CF8)
+- Accent: Pink (#F472B6)
+- Background: Deep dark (#0A0A0F)
+- Card: Dark slate (#0F141E)
 
-## License
-Private - All rights reserved
+### Custom Achievements
+Add new achievements in the SQL schema's seed data section.
 
-## Support
-For issues, questions, or feature requests, contact the development team.
+## 🔒 Security
+
+### Row Level Security (RLS)
+All tables have RLS enabled with policies that:
+- Restrict data access to authenticated users
+- Ensure users only see their own data
+- Allow public access for shared content
+- Enforce group membership for collaborative features
+
+### Authentication
+- Email/password with confirmation
+- Google OAuth
+- GitHub OAuth
+- Session persistence
+- Auto token refresh
+
+## 📊 Database Indexes
+
+Performance-optimized indexes on:
+- User lookups
+- Time-based queries (created_at, updated_at)
+- Full-text search fields
+- Foreign key relationships
+- Leaderboard rankings
+
+## 🎯 Gamification System
+
+### XP & Levels
+- Earn XP for study activities
+- Level up formula: `FLOOR(1 + SQRT(1 + 8 * XP / 100) / 2)`
+- Track total XP and current level
+
+### Achievements
+- 4 tiers: Bronze, Silver, Gold, Platinum
+- 5 categories: Streak, Mastery, Social, Milestone, Special
+- Automatic unlocking based on criteria
+- XP rewards on unlock
+
+### Streaks
+- Daily study tracking
+- Current and longest streak
+- Streak warnings
+- Achievements for consistency
+
+### Leaderboards
+- Daily, Weekly, Monthly, All-time
+- Categories: XP, Streak, Study Time, Mastery
+- Rank tracking
+- Privacy controls
+
+## 🚢 Deployment
+
+### Replit Deployment (Recommended)
+1. Configure all environment variables in Replit Secrets
+2. Run the SQL schema in your Supabase project
+3. Click "Deploy" in Replit
+4. The app is configured for autoscale deployment
+
+### Manual Deployment
+The app can be deployed to any static hosting service:
+- Netlify
+- Vercel
+- GitHub Pages (with API proxy)
+- AWS S3 + CloudFront
+
+Build command: `npm run build`  
+Output directory: `dist`
+
+## 📝 Development Notes
+
+### Code Organization
+```
+src/
+├── components/       # React components
+│   ├── auth/        # Authentication
+│   ├── enhanced/    # Modern UI components
+│   └── ui/          # Base UI components
+├── contexts/        # React contexts
+├── hooks/           # Custom hooks
+│   └── useSupabaseQuery.ts  # React Query hooks
+├── lib/             # Utilities & config
+├── services/        # Business logic
+├── types/           # TypeScript types
+└── App.tsx          # Main app component
+```
+
+### State Management
+- **React Query**: Server state (Supabase data)
+- **Zustand**: Flashcard context
+- **React Context**: Auth, theme
+- **useState**: Local component state
+
+### File Processing
+- PDF: PDF.js for text extraction
+- PPTX: JSZip + XML parsing
+- Text chunking for AI processing
+
+## 🐛 Troubleshooting
+
+### Supabase Connection Issues
+- Verify environment variables are set correctly
+- Check Supabase project status
+- Ensure RLS policies are applied
+- Check browser console for errors
+
+### AI Generation Fails
+- Verify OpenRouter API key
+- Check API credit balance
+- Ensure file content was extracted properly
+- Try with smaller files first
+
+### Build Errors
+- Clear node_modules and reinstall
+- Update dependencies
+- Check for TypeScript errors
+- Verify all imports are correct
+
+## 📚 Resources
+
+- [Supabase Documentation](https://supabase.com/docs)
+- [OpenRouter API](https://openrouter.ai/docs)
+- [React Query Docs](https://tanstack.com/query/latest)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Radix UI](https://www.radix-ui.com)
+
+## 🤝 Contributing
+
+This is an educational project. Key areas for contribution:
+- Additional AI models and providers
+- More file format support
+- Enhanced analytics
+- Mobile app version
+- Collaborative features
+- More gamification elements
+
+## 📄 License
+
+MIT License - Feel free to use for learning and personal projects.
+
+## 🎓 Learning Path
+
+Recommended order for understanding the codebase:
+1. Database schema (`supabase/schema.sql`)
+2. Type definitions (`src/types/database.ts`)
+3. Supabase setup (`src/lib/supabase.ts`)
+4. React Query hooks (`src/hooks/useSupabaseQuery.ts`)
+5. Auth flow (`src/contexts/AuthContext.tsx`)
+6. Main app (`src/App.tsx`)
+7. Feature components (`src/components/`)
+
+## 🔮 Future Enhancements
+
+**Planned Features:**
+- Voice input for notes
+- Mobile apps (React Native)
+- Offline mode with sync
+- Collaborative editing
+- Video content support
+- Custom AI model training
+- Integration with LMS platforms
+- Browser extension
+- Desktop app (Electron)
+
+**Technical Improvements:**
+- WebSocket real-time updates
+- Service workers for offline
+- Advanced caching strategies
+- GraphQL API layer
+- Microservices architecture
+- Kubernetes deployment
+- CI/CD pipelines
+- Automated testing suite
+
+---
+
+**Made with ❤️ for learners everywhere**
