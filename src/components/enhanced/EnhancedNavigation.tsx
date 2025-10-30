@@ -1,7 +1,8 @@
 import React from 'react';
 import { 
   LayoutDashboard, Upload, BookOpen, Brain, Layers, 
-  MessageSquare, Settings, Sparkles, TrendingUp, Command
+  MessageSquare, Settings, Sparkles, TrendingUp, Command,
+  Trophy, Clock, Target
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
@@ -23,6 +24,10 @@ const navItems: NavItem[] = [
   { id: 'quiz', label: 'Quizzes', icon: Brain, gradient: 'from-orange-500 to-red-500' },
   { id: 'flashcards', label: 'Flashcards', icon: Layers, gradient: 'from-indigo-500 to-purple-500' },
   { id: 'chat', label: 'Chat Q&A', icon: MessageSquare, gradient: 'from-pink-500 to-rose-500' },
+  { id: 'ai-tutor', label: 'AI Tutor', icon: Brain, gradient: 'from-purple-500 to-blue-500' },
+  { id: 'challenges', label: 'Challenges', icon: Trophy, gradient: 'from-yellow-500 to-orange-500' },
+  { id: 'leaderboard', label: 'Leaderboard', icon: Target, gradient: 'from-red-500 to-pink-500' },
+  { id: 'study-timer', label: 'Timer', icon: Clock, gradient: 'from-blue-500 to-purple-500' },
   { id: 'settings', label: 'Settings', icon: Settings, gradient: 'from-slate-500 to-gray-500' },
 ];
 

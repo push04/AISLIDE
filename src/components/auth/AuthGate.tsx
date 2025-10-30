@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { LoginForm } from './LoginForm';
-import { RegisterForm } from './RegisterForm';
+import React from 'react';
+import { LandingPage } from './LandingPage';
 import { useAuth } from '../../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -11,7 +10,6 @@ interface AuthGateProps {
 
 export function AuthGate({ children }: AuthGateProps) {
   const { user, loading } = useAuth();
-  const [showRegister, setShowRegister] = useState(false);
 
   // Check if Supabase is configured - REQUIRED for production
   if (!isSupabaseConfigured()) {
@@ -56,13 +54,9 @@ export function AuthGate({ children }: AuthGateProps) {
     );
   }
 
-  // Show auth forms if not logged in
+  // Show landing page if not logged in
   if (!user) {
-    return showRegister ? (
-      <RegisterForm onSwitchToLogin={() => setShowRegister(false)} />
-    ) : (
-      <LoginForm onSwitchToRegister={() => setShowRegister(true)} />
-    );
+    return <LandingPage />;
   }
 
   // User is logged in, show the app

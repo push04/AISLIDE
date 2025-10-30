@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient';
 import { EnhancedNavigation } from './components/enhanced/EnhancedNavigation';
 import { EnhancedDashboard } from './components/enhanced/EnhancedDashboard';
 import { AnalyticsDashboard } from './components/enhanced/AnalyticsDashboard';
@@ -21,8 +23,15 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { KeyboardShortcutsGuide } from './components/KeyboardShortcutsGuide';
 import { useUploads, useCreateUpload, useDeleteUpload, useUserProfile } from './hooks/useSupabaseQuery';
+import { SocraticTutor } from './components/SocraticTutor';
+import { DailyChallenges } from './components/DailyChallenges';
+import { Leaderboard } from './components/Leaderboard';
+import { StudyTimer } from './components/StudyTimer';
+import { AdaptiveLearning } from './components/AdaptiveLearning';
+import { VideoToLesson } from './components/VideoToLesson';
+import { ImageRecognition } from './components/ImageRecognition';
 
-export type TabType = 'dashboard' | 'upload' | 'lessons' | 'quiz' | 'flashcards' | 'chat' | 'settings' | 'analytics' | 'profile';
+export type TabType = 'dashboard' | 'upload' | 'lessons' | 'quiz' | 'flashcards' | 'chat' | 'settings' | 'analytics' | 'profile' | 'ai-tutor' | 'challenges' | 'leaderboard' | 'study-timer';
 
 /**
  * The main application component.
@@ -49,7 +58,7 @@ function AppContent() {
   } = useUserProfile();
   
   const uploads = uploadsData || [];
-  const apiKey = userProfile?.openrouter_api_key_encrypted || '';
+  const apiKey = (userProfile as any)?.openrouter_api_key_encrypted || '';
   
   // Check for errors first (React Query can have isLoading && error simultaneously)
   const hasError = (uploadsError && !uploadsLoading) || (profileError && !profileLoading);
@@ -124,19 +133,56 @@ function AppContent() {
   // A map of tab keys to their corresponding components for cleaner rendering
   const viewMap: Record<TabType, React.ReactNode> = {
     dashboard: <EnhancedDashboard uploads={uploads} onNavigate={setActiveTab} />,
-    analytics: <AnalyticsDashboard />,
+    analytics: (
+      <div className="space-y-6">
+        <AnalyticsDashboard />
+        <AdaptiveLearning 
+          userPerformance={{
+            correctAnswers: 45,
+            totalAnswers: 60,
+            avgResponseTime: 12,
+            topicsStruggling: ['Advanced Calculus', 'Organic Chemistry']
+          }}
+        />
+      </div>
+    ),
     profile: <ProfilePage />,
     upload: (
-      <UploadManager
-        uploads={uploads}
-        onAddUpload={handleAddUpload}
-        onDeleteUpload={handleDeleteUpload}
-      />
+      <div className="space-y-6">
+        <UploadManager
+          uploads={uploads}
+          onAddUpload={handleAddUpload}
+          onDeleteUpload={handleDeleteUpload}
+        />
+        <div className="grid md:grid-cols-2 gap-6">
+          <VideoToLesson 
+            onVideoProcessed={(data) => console.log('Video processed:', data)}
+            apiKey={apiKey}
+          />
+          <ImageRecognition
+            onImageProcessed={(data) => console.log('Image processed:', data)}
+            apiKey={apiKey}
+          />
+        </div>
+      </div>
     ),
     lessons: <LessonGenerator uploads={uploads} apiKey={apiKey} />,
     quiz: <QuizManager uploads={uploads} apiKey={apiKey} />,
     flashcards: <FlashcardManager uploads={uploads} apiKey={apiKey} />,
     chat: <ChatInterface uploads={uploads} apiKey={apiKey} />,
+    'ai-tutor': <SocraticTutor apiKey={apiKey} />,
+    challenges: (
+      <DailyChallenges 
+        userLevel={15}
+        onChallengeComplete={(challenge) => console.log('Challenge completed:', challenge)}
+      />
+    ),
+    leaderboard: <Leaderboard currentUserId="current-user" currentUserXP={2500} />,
+    'study-timer': (
+      <StudyTimer
+        onSessionComplete={(duration, type) => console.log(`${type} session completed: ${duration}s`)}
+      />
+    ),
     settings: <Settings uploads={uploads} />,
   };
 
@@ -182,21 +228,23 @@ function AppContent() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <ErrorBoundary>
-          <AuthProvider>
-            <ErrorBoundary>
-              <FlashcardProvider>
-                <ErrorBoundary>
-                  <AuthGate>
-                    <AppContent />
-                  </AuthGate>
-                </ErrorBoundary>
-              </FlashcardProvider>
-            </ErrorBoundary>
-          </AuthProvider>
-        </ErrorBoundary>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <ErrorBoundary>
+            <AuthProvider>
+              <ErrorBoundary>
+                <FlashcardProvider>
+                  <ErrorBoundary>
+                    <AuthGate>
+                      <AppContent />
+                    </AuthGate>
+                  </ErrorBoundary>
+                </FlashcardProvider>
+              </ErrorBoundary>
+            </AuthProvider>
+          </ErrorBoundary>
+        </ThemeProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }
