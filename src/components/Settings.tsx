@@ -1,20 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Key, Download, AlertCircle, CheckCircle } from 'lucide-react';
 import { Upload } from '../services/FileProcessor';
+import { useUserProfile, useUpdateUserProfile } from '../hooks/useSupabaseQuery';
+import toast from 'react-hot-toast';
 
 interface SettingsProps {
-  apiKey: string;
-  onApiKeyChange: (key: string) => void;
   uploads: Upload[];
 }
 
-export const Settings: React.FC<SettingsProps> = ({ apiKey, onApiKeyChange, uploads }) => {
+export const Settings: React.FC<SettingsProps> = ({ uploads }) => {
+  const { data: userProfile, isLoading } = useUserProfile();
+  const updateProfileMutation = useUpdateUserProfile();
+  
   const [showKey, setShowKey] = useState(false);
-  const [tempKey, setTempKey] = useState(apiKey);
+  const [tempKey, setTempKey] = useState('');
 
-  const handleSaveKey = () => {
-    onApiKeyChange(tempKey);
-    alert('API key saved successfully!');
+  useEffect(() => {
+    if (userProfile?.openrouter_api_key_encrypted) {
+      setTempKey(userProfile.openrouter_api_key_encrypted);
+    }
+  }, [userProfile]);
+
+  const handleSaveKey = async () => {
+    try {
+      await updateProfileMutation.mutateAsync({
+        openrouter_api_key_encrypted: tempKey
+      });
+      toast.success('API key saved successfully!');
+    } catch (error) {
+      toast.error('Failed to save API key');
+      console.error('Error saving API key:', error);
+    }
   };
 
   const exportAllData = () => {
@@ -47,9 +63,11 @@ export const Settings: React.FC<SettingsProps> = ({ apiKey, onApiKeyChange, uplo
     }
   };
 
+  const apiKey = userProfile?.openrouter_api_key_encrypted || '';
+
   const diagnostics = [
     { name: 'OpenRouter API Key', status: !!apiKey, description: 'Required for AI features' },
-    { name: 'Local Storage', status: typeof localStorage !== 'undefined', description: 'Data persistence' },
+    { name: 'Supabase Connected', status: !isLoading && !!userProfile, description: 'Database connection' },
     { name: 'File API', status: typeof File !== 'undefined', description: 'File upload support' },
     { name: 'Fetch API', status: typeof fetch !== 'undefined', description: 'API communication' },
   ];
@@ -99,7 +117,7 @@ export const Settings: React.FC<SettingsProps> = ({ apiKey, onApiKeyChange, uplo
               </button>
             </div>
             <p className="text-sm text-slate-600 mt-2">
-              Your API key is stored locally in your browser and is required for all AI features.
+              Your API key is stored securely in your profile and is required for all AI features.
             </p>
           </div>
         </div>

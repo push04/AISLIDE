@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { cn } from '../../lib/utils';
+import { GlobalSearch } from '../GlobalSearch';
 import type { TabType } from '../../App';
 
 interface NavItem {
@@ -53,8 +54,13 @@ export function EnhancedNavigation({ activeTab, onTabChange }: EnhancedNavigatio
             </div>
           </div>
 
+          {/* Global Search */}
+          <div className="hidden md:block flex-1 max-w-md mx-8">
+            <GlobalSearch onNavigate={onTabChange} />
+          </div>
+
           {/* Navigation Items */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;

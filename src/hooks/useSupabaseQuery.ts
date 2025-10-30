@@ -80,7 +80,7 @@ export function useCreateUpload() {
   const { user } = useAuth();
   
   return useMutation({
-    mutationFn: async (upload: Tables['uploads']['Insert']) => {
+    mutationFn: async (upload: Omit<Tables['uploads']['Insert'], 'user_id'>) => {
       if (!supabase || !user) throw new Error('Not authenticated');
       
       const { data, error } = await supabase
@@ -149,10 +149,10 @@ export function useCreateLesson() {
   const { user } = useAuth();
   
   return useMutation({
-    mutationFn: async (lesson: Tables['lessons']['Insert']) => {
+    mutationFn: async (lesson: Omit<Tables['lessons']['Insert'], 'user_id'>) => {
       if (!supabase || !user) throw new Error('Not authenticated');
       
-      const { data, error } = await supabase
+      const { data, error} = await supabase
         .from('lessons')
         .insert({ ...lesson, user_id: user.id })
         .select()
@@ -195,7 +195,7 @@ export function useCreateFlashcardDeck() {
   const { user } = useAuth();
   
   return useMutation({
-    mutationFn: async (deck: Tables['flashcard_decks']['Insert']) => {
+    mutationFn: async (deck: Omit<Tables['flashcard_decks']['Insert'], 'user_id'>) => {
       if (!supabase || !user) throw new Error('Not authenticated');
       
       const { data, error } = await supabase
@@ -331,7 +331,7 @@ export function useCreateChatConversation() {
   const { user } = useAuth();
   
   return useMutation({
-    mutationFn: async (conversation: Tables['chat_conversations']['Insert']) => {
+    mutationFn: async (conversation: Omit<Tables['chat_conversations']['Insert'], 'user_id'>) => {
       if (!supabase || !user) throw new Error('Not authenticated');
       
       const { data, error } = await supabase
@@ -379,6 +379,145 @@ export function useCreateChatMessage() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['chat-messages', data.conversation_id] });
       queryClient.invalidateQueries({ queryKey: ['chat-conversations'] });
+    },
+  });
+}
+
+// Hook for fetching quiz sessions
+export function useQuizSessions() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['quiz-sessions', user?.id],
+    queryFn: async () => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('quiz_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !!supabase,
+  });
+}
+
+// Hook for creating a quiz session
+export function useCreateQuizSession() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (session: Omit<Tables['quiz_sessions']['Insert'], 'user_id'>) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('quiz_sessions')
+        .insert({ ...session, user_id: user.id })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quiz-sessions', user?.id] });
+    },
+  });
+}
+
+// Hook for fetching quiz questions for a session
+export function useQuizQuestions(sessionId: string | null) {
+  return useQuery({
+    queryKey: ['quiz-questions', sessionId],
+    queryFn: async () => {
+      if (!supabase || !sessionId) throw new Error('No session selected');
+      
+      const { data, error } = await supabase
+        .from('quiz_questions')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!supabase && !!sessionId,
+  });
+}
+
+// Hook for creating a quiz question
+export function useCreateQuizQuestion() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (question: Tables['quiz_questions']['Insert']) => {
+      if (!supabase) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('quiz_questions')
+        .insert(question)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['quiz-questions', data.session_id] });
+    },
+  });
+}
+
+// Hook for updating a quiz question (for answers/scoring)
+export function useUpdateQuizQuestion() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Tables['quiz_questions']['Update'] }) => {
+      if (!supabase) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('quiz_questions')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['quiz-questions', data.session_id] });
+    },
+  });
+}
+
+// Hook for updating a quiz session (for completion/scoring)
+export function useUpdateQuizSession() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Tables['quiz_sessions']['Update'] }) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('quiz_sessions')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quiz-sessions', user?.id] });
     },
   });
 }
