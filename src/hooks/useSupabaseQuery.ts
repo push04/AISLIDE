@@ -521,3 +521,278 @@ export function useUpdateQuizSession() {
     },
   });
 }
+
+// ============================================================================
+// GAMIFICATION & PROGRESS TRACKING HOOKS
+// ============================================================================
+
+// Hook for fetching user achievements
+export function useUserAchievements() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['user-achievements', user?.id],
+    queryFn: async () => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select(`
+          *,
+          achievement:achievements(*)
+        `)
+        .eq('user_id', user.id)
+        .order('earned_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !!supabase,
+  });
+}
+
+// Hook for unlocking an achievement
+export function useUnlockAchievement() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (achievementId: string) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .insert({
+          user_id: user.id,
+          achievement_id: achievementId,
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-achievements', user?.id] });
+    },
+  });
+}
+
+// Hook for fetching bookmarks
+export function useBookmarks() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['bookmarks', user?.id],
+    queryFn: async () => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('bookmarks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !!supabase,
+  });
+}
+
+// Hook for creating a bookmark
+export function useCreateBookmark() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (bookmark: Omit<Tables['bookmarks']['Insert'], 'user_id'>) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('bookmarks')
+        .insert({ ...bookmark, user_id: user.id })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookmarks', user?.id] });
+    },
+  });
+}
+
+// Hook for deleting a bookmark
+export function useDeleteBookmark() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (bookmarkId: string) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { error } = await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('id', bookmarkId)
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookmarks', user?.id] });
+    },
+  });
+}
+
+// Hook for fetching user tags
+export function useUserTags() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['user-tags', user?.id],
+    queryFn: async () => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_tags')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !!supabase,
+  });
+}
+
+// Hook for creating a tag
+export function useCreateTag() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (tag: Omit<Tables['user_tags']['Insert'], 'user_id'>) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_tags')
+        .insert({ ...tag, user_id: user.id })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-tags', user?.id] });
+    },
+  });
+}
+
+// Hook for fetching user goals
+export function useUserGoals() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['user-goals', user?.id],
+    queryFn: async () => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_goals')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !!supabase,
+  });
+}
+
+// Hook for creating a goal
+export function useCreateGoal() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (goal: Omit<Tables['user_goals']['Insert'], 'user_id'>) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_goals')
+        .insert({ ...goal, user_id: user.id })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-goals', user?.id] });
+    },
+  });
+}
+
+// Hook for updating a goal
+export function useUpdateGoal() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Tables['user_goals']['Update'] }) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_goals')
+        .update(updates)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-goals', user?.id] });
+    },
+  });
+}
+
+// Hook for awarding XP
+export function useAwardXP() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const updateProfile = useUpdateUserProfile();
+  
+  return useMutation({
+    mutationFn: async (xp: number) => {
+      if (!user) throw new Error('Not authenticated');
+      
+      const { data: profile } = await supabase!
+        .from('user_profiles')
+        .select('total_xp, current_level')
+        .eq('id', user.id)
+        .single();
+      
+      if (!profile) throw new Error('Profile not found');
+      
+      const newXP = (profile.total_xp || 0) + xp;
+      const newLevel = Math.floor(newXP / 1000) + 1;
+      
+      return updateProfile.mutateAsync({
+        total_xp: newXP,
+        current_level: newLevel,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user?.id] });
+    },
+  });
+}

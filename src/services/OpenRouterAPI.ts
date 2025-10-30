@@ -92,7 +92,11 @@ const MODEL_ORDER = {
 } as const;
 
 export class OpenRouterAPI {
-  constructor(private apiKey: string) {}
+  constructor(private apiKey: string) {
+    if (!apiKey || apiKey.trim() === '' || apiKey === 'placeholder-key') {
+      throw new Error('OpenRouter API key is required. Please configure your API key in Settings.');
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Core helpers
@@ -166,7 +170,7 @@ export class OpenRouterAPI {
   }
 
   private async completionWithFallback(
-    models: string[],
+    models: readonly string[],
     messages: ChatMessage[],
     options: CompletionOpts = {}
   ): Promise<{ content: string; finish: string; model: string; raw: any } | Response> {

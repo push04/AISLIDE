@@ -74,3 +74,26 @@ export function extractJSONFromResponse(text: string): Record<string, any> | nul
 
   return null;
 }
+
+/**
+ * Type-safe JSON parser with validation
+ * Ensures parsed data conforms to expected structure before returning
+ */
+export function parseJSONSafely<T>(
+  text: string,
+  validator: (data: any) => data is T,
+  errorMessage: string = 'Invalid JSON structure'
+): T {
+  const parsed = extractJSONFromResponse(text);
+  
+  if (!parsed) {
+    throw new Error('Failed to extract valid JSON from AI response. The model may be experiencing issues. Please try again.');
+  }
+  
+  if (!validator(parsed)) {
+    console.error('Validation failed for parsed JSON:', parsed);
+    throw new Error(errorMessage);
+  }
+  
+  return parsed;
+}

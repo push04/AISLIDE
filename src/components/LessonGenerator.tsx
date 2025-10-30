@@ -182,10 +182,10 @@ export const LessonGenerator: React.FC<LessonGeneratorProps> = ({ uploads, apiKe
     dispatch({ type: 'START_GENERATION' });
     try {
       const api = new OpenRouterAPI(apiKey);
-      // Assumes your OpenRouterAPI class is updated to take the upload object
       const rawContent = await api.generateLesson(selectedUpload); 
       const parsedContent = extractJSONFromResponse(rawContent);
-      dispatch({ type: 'GENERATION_SUCCESS', payload: { raw: rawContent, parsed: parsedContent as ParsedLesson } });
+      
+      dispatch({ type: 'GENERATION_SUCCESS', payload: { raw: rawContent, parsed: parsedContent || null } });
     } catch (err: any) {
       dispatch({ type: 'GENERATION_FAILURE', payload: err.message || 'An unknown error occurred.' });
     }
