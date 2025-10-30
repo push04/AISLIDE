@@ -56,9 +56,39 @@ function AppContent() {
     error: profileError,
     refetch: refetchProfile 
   } = useUserProfile();
+
+  const handleAddUpload = useCallback(async (file: File): Promise<Upload> => {
+    const newUpload = await processor.processFile(file);
+    
+    await createUploadMutation.mutateAsync({
+      filename: newUpload.filename,
+      original_filename: file.name,
+      file_size: newUpload.size,
+      mime_type: file.type,
+      storage_path: `uploads/${newUpload.id}/${file.name}`,
+      full_text: newUpload.fullText,
+      slide_count: newUpload.slideCount,
+      status: newUpload.status,
+      processed: newUpload.processed,
+      indexed: newUpload.indexed,
+      metadata: {},
+      error_message: newUpload.errorMessage || null,
+      version: 1,
+      parent_upload_id: null,
+    });
+    
+    return newUpload;
+  }, [createUploadMutation]);
+
+  const handleDeleteUpload = useCallback((id: string) => {
+    deleteUploadMutation.mutate(id);
+  }, [deleteUploadMutation]);
   
   const uploads = uploadsData || [];
-  const apiKey = (userProfile as any)?.openrouter_api_key_encrypted || '';
+  // Safely extract API key from userProfile
+  const apiKey = (userProfile && 'openrouter_api_key_encrypted' in userProfile 
+    ? userProfile.openrouter_api_key_encrypted 
+    : null) || '';
   
   // Check for errors first (React Query can have isLoading && error simultaneously)
   const hasError = (uploadsError && !uploadsLoading) || (profileError && !profileLoading);
@@ -102,34 +132,6 @@ function AppContent() {
     return <LoadingSpinner fullScreen text="Loading your data..." />;
   }
 
-  const handleAddUpload = useCallback(async (file: File): Promise<Upload> => {
-    const newUpload = await processor.processFile(file);
-    
-    await createUploadMutation.mutateAsync({
-      filename: newUpload.filename,
-      original_filename: file.name,
-      file_size: newUpload.size,
-      mime_type: file.type,
-      storage_path: `uploads/${newUpload.id}/${file.name}`,
-      full_text: newUpload.fullText,
-      slide_count: newUpload.slideCount,
-      status: newUpload.status,
-      processed: newUpload.processed,
-      indexed: newUpload.indexed,
-      metadata: {},
-      error_message: newUpload.errorMessage || null,
-      version: 1,
-      parent_upload_id: null,
-    });
-    
-    return newUpload;
-  }, [createUploadMutation]);
-
-
-  const handleDeleteUpload = useCallback((id: string) => {
-    deleteUploadMutation.mutate(id);
-  }, [deleteUploadMutation]);
-
   // A map of tab keys to their corresponding components for cleaner rendering
   const viewMap: Record<TabType, React.ReactNode> = {
     dashboard: <EnhancedDashboard uploads={uploads} onNavigate={setActiveTab} />,
@@ -156,11 +158,11 @@ function AppContent() {
         />
         <div className="grid md:grid-cols-2 gap-6">
           <VideoToLesson 
-            onVideoProcessed={(data) => console.log('Video processed:', data)}
+            onVideoProcessed={() => {}}
             apiKey={apiKey}
           />
           <ImageRecognition
-            onImageProcessed={(data) => console.log('Image processed:', data)}
+            onImageProcessed={() => {}}
             apiKey={apiKey}
           />
         </div>
@@ -174,13 +176,13 @@ function AppContent() {
     challenges: (
       <DailyChallenges 
         userLevel={15}
-        onChallengeComplete={(challenge) => console.log('Challenge completed:', challenge)}
+        onChallengeComplete={() => {}}
       />
     ),
     leaderboard: <Leaderboard currentUserId="current-user" currentUserXP={2500} />,
     'study-timer': (
       <StudyTimer
-        onSessionComplete={(duration, type) => console.log(`${type} session completed: ${duration}s`)}
+        onSessionComplete={() => {}}
       />
     ),
     settings: <Settings uploads={uploads} />,

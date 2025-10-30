@@ -1,5 +1,4 @@
-import React from 'react';
-import { Upload, BookOpen, Brain, Layers, MessageSquare, TrendingUp, Clock, Target, Sparkles } from 'lucide-react';
+import { Upload, BookOpen, Brain, MessageSquare, Clock, Target, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './Card';
 import { Button } from './Button';
 import type { TabType } from '../../App';
@@ -16,7 +15,7 @@ export function EnhancedDashboard({ uploads, onNavigate }: EnhancedDashboardProp
     totalUploads: uploads.length,
     processedUploads: uploads.filter(u => u.processed).length,
     indexedUploads: uploads.filter(u => u.indexed).length,
-    totalSlides: uploads.reduce((sum, u) => sum + u.slideCount, 0),
+    totalSlides: uploads.reduce((sum, u) => sum + (u.slideCount || 0), 0),
   };
 
   const recentUploads = uploads.slice(0, 5);

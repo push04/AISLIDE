@@ -275,7 +275,7 @@ const UploadedFileItem = memo(({ upload, onDelete }: { upload: Upload; onDelete:
             </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-            <CheckCircle className="w-5 h-5 text-emerald-600" title="Completed"/>
+            <CheckCircle className="w-5 h-5 text-emerald-600" />
             <button onClick={onDelete} title="Delete" className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-md"><Trash2 className="w-4 h-4" /></button>
         </div>
     </div>
@@ -365,7 +365,12 @@ export const UploadManager: React.FC<UploadManagerProps> = ({
     const validEntries = newEntries.filter((e): e is UploadEntry => !('error' in e));
     const errors = newEntries.filter((e): e is {error: string} => 'error' in e);
     if(errors.length > 0) {
-        setGlobalError(`${errors.length} file(s) could not be added. ${errors[0].error}`);
+        const uniqueErrors = [...new Set(errors.map(e => e.error))];
+        if (uniqueErrors.length === 1) {
+            setGlobalError(`${errors.length} file(s) could not be added: ${uniqueErrors[0]}`);
+        } else {
+            setGlobalError(`${errors.length} file(s) could not be added: ${uniqueErrors.join(', ')}`);
+        }
     }
     
     if(validEntries.length > 0) dispatch(uploaderActions.add(validEntries));

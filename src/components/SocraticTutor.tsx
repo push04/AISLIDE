@@ -14,7 +14,7 @@ interface SocraticTutorProps {
   apiKey: string;
 }
 
-export function SocraticTutor({ topic, context, apiKey }: SocraticTutorProps) {
+export function SocraticTutor({ topic, apiKey }: SocraticTutorProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -47,18 +47,21 @@ export function SocraticTutor({ topic, context, apiKey }: SocraticTutorProps) {
       let assistantMessage: Message;
       
       if (mode === 'socratic') {
-        const socraticResponses = [
+        const socraticResponses: Message[] = [
           {
+            role: 'assistant',
             content: "That's an interesting thought! Let me ask you this: What do you think would happen if we approached this from a different angle? Can you break down what you already know about this?",
-            type: 'question' as const
+            type: 'question'
           },
           {
+            role: 'assistant',
             content: "Good question! Before I answer directly, let's explore together. What patterns do you notice? What have you learned about similar concepts?",
-            type: 'question' as const
+            type: 'question'
           },
           {
+            role: 'assistant',
             content: "Let's think about this step by step. What is the first thing that comes to mind when you think about this problem? Why do you think that is?",
-            type: 'question' as const
+            type: 'question'
           }
         ];
         assistantMessage = socraticResponses[Math.floor(Math.random() * socraticResponses.length)];
@@ -76,7 +79,7 @@ export function SocraticTutor({ topic, context, apiKey }: SocraticTutorProps) {
         };
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', ...assistantMessage }]);
+      setMessages(prev => [...prev, assistantMessage]);
       setIsProcessing(false);
 
     } catch (error) {

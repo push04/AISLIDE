@@ -36,6 +36,8 @@ export class OpenRouterAPI {
       stream = false,
     } = options;
 
+    const failures: { model: string; error: string }[] = [];
+
     for (const model of MODELS_POOL) {
       try {
         const response = await fetch(OPENROUTER_API_URL, {
@@ -55,18 +57,28 @@ export class OpenRouterAPI {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
-        return data.choices[0]?.message?.content || '';
+        const content = data.choices[0]?.message?.content;
+        
+        if (!content) {
+          throw new Error('Empty response from model');
+        }
+        
+        return content;
       } catch (error) {
-        console.warn(`Failed to use model ${model}:`, error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        failures.push({ model, error: errorMessage });
+        console.warn(`Model ${model} failed:`, errorMessage);
         continue;
       }
     }
 
-    throw new Error('All AI models failed to respond');
+    const failureDetails = failures.map(f => `${f.model}: ${f.error}`).join('; ');
+    throw new Error(`All AI models failed. Details: ${failureDetails}`);
   }
 
   async generateLesson(content: string): Promise<string> {
